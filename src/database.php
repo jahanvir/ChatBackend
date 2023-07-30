@@ -225,18 +225,3 @@ function isUserInGroup($userId, $groupId)
         return false;
     }
 }
-
-
-// Function to retrieve all groups from the database
-// function getAllGroupsFromDatabase()
-// {
-//     // Call the database function to fetch all groups
-//     $groups = []; // Replace this with your actual database query to fetch groups
-
-//     // For demonstration purposes, let's assume some sample data
-//     // You should replace this with your actual database query
-//     $groups[] = ['id' => 1, 'name' => 'Group A', 'description' => 'Description of Group A'];
-//     $groups[] = ['id' => 2, 'name' => 'Group B', 'description' => 'Description of Group B'];
-
-//     return $groups;
-// }

@@ -53,6 +53,14 @@ function signIn(Request $request, Response $response)
     $username = $data['username'];
     $password = $data['password'];
 
+    if (empty($username) || empty($password)) {
+        $stream = $streamFactory->createStream(json_encode(['error' => 'Username and password are required']));
+
+        return $responseFactory->createResponse(400)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($stream);
+    }
+
     $user = getUserByUsername($username);
 
     if (!$user || !password_verify($password, $user['password'])) {
@@ -102,6 +110,10 @@ function signOut(Request $request, Response $response)
     // Destroy the session (log out the user)
     session_destroy();
 
+    setcookie('username', '', time() + (86400 * 30), '/', '', false, true);
+    setcookie('token', '', time() + (86400 * 30), '/', '', false, true);
+    setcookie('userid', '', time() + (86400 * 30), '/', '', false, true);
+
     $stream = $streamFactory->createStream(json_encode(['message' => 'Logged out successfully']));
     return $responseFactory->createResponse(201)
     ->withHeader('Content-Type', 'application/json')
@@ -115,20 +127,26 @@ function getAllGroups(Request $request, Response $response)
     $responseFactory = new ResponseFactory();
     $streamFactory = new StreamFactory();
 
-    if (isUserAuthenticated($request)){
+    if (!isUserAuthenticated($request)) {
+        // User is not authenticated, return an authentication error response
+        $stream = $streamFactory->createStream(json_encode(['error' => 'Authentication error']));
+        return $responseFactory->createResponse(401)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($stream);
+    }
+    try {
         $groups = getAllGroupsFromDatabase();
         $stream = $streamFactory->createStream(json_encode($groups));
         return $responseFactory->createResponse(201)
         ->withHeader('Content-Type', 'application/json')
         ->withBody($stream);
+    } catch (\Exception $e) {
+        // Handle any exceptions that occur during the database operation
+        $stream = $streamFactory->createStream(json_encode(['error' => 'Error Fetching Groups']));
+        return $responseFactory->createResponse(500)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($stream); 
     }
-    else{
-        $stream = $streamFactory->createStream(json_encode(['error' => 'Authentication error']));
-        return $responseFactory->createResponse(401)
-        ->withHeader('Content-Type', 'application/json')
-        ->withBody($stream);
-    }
-    // return $response->withJson($groups);
     
 }
 
@@ -138,29 +156,29 @@ function getGroup(Request $request, Response $response, $args)
     $streamFactory = new StreamFactory();
     $groupid = $args['id'];
 
-    // Verify the token based on the username
-    if (isUserAuthenticated($request)) {
-        // The token is valid, proceed to fetch the group data
-        $group = getGroupByID($groupid);
-        if ($group) {
-            $stream = $streamFactory->createStream(json_encode($group));
-            return $responseFactory->createResponse(201)
-                ->withHeader('Content-Type', 'application/json')
-                ->withBody($stream);
-        } else {
-            // Group not found, return an error response
-            // $errorResponse = $response->withStatus(404);
-            // $errorResponse->getBody()->write(json_encode(['error' => 'Group not found']));
-            // return $errorResponse->withHeader('Content-Type', 'application/json');
-            $stream = $streamFactory->createStream(json_encode(['error' => 'Group not found']));
-                return $responseFactory->createResponse(404)
-                ->withHeader('Content-Type', 'application/json')
-                ->withBody($stream);
-        }
-    } else {
-        // Invalid token, return an error response
+    if (!isUserAuthenticated($request)) {
+        // User is not authenticated, return an authentication error response
         $stream = $streamFactory->createStream(json_encode(['error' => 'Authentication error']));
         return $responseFactory->createResponse(401)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($stream);
+    }
+    // Verify the token based on the username
+
+        // The token is valid, proceed to fetch the group data
+    $group = getGroupByID($groupid);
+    if ($group) {
+        $stream = $streamFactory->createStream(json_encode($group));
+        return $responseFactory->createResponse(201)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($stream);
+    } else {
+        // Group not found, return an error response
+        // $errorResponse = $response->withStatus(404);
+        // $errorResponse->getBody()->write(json_encode(['error' => 'Group not found']));
+        // return $errorResponse->withHeader('Content-Type', 'application/json');
+        $stream = $streamFactory->createStream(json_encode(['error' => 'Group not found']));
+            return $responseFactory->createResponse(404)
             ->withHeader('Content-Type', 'application/json')
             ->withBody($stream);
     }
@@ -181,26 +199,35 @@ function addNewGroup(Request $request, Response $response)
 
     $data = $request->getParsedBody();
 
+    $groupname = $data['groupname'] ?? '';
+    $groupabout = $data['groupabout'] ?? '';
     // Check if the required fields are provided in the request body
-    if (!isset($data['groupname']) || !isset($data['groupabout'])) {
+    if (empty($groupname) || empty($groupabout)) {
         $stream = $streamFactory->createStream(json_encode(['error' => 'Missing groupname or groupabout']));
         return $responseFactory->createResponse(400)
             ->withHeader('Content-Type', 'application/json')
             ->withBody($stream);
     }
 
-    $groupname = $data['groupname'];
-    $groupabout = $data['groupabout'];
     $createdAt = date('Y-m-d H:i:s');
     // Create the new group in the database
-    $groupId = createGroup($groupname, $groupabout,$createdAt);
-
-    // Return the newly created group in the response
-    $newGroup = ['groupid' => $groupId, 'groupname' => $groupname, 'groupabout' => $groupabout];
-    $stream = $streamFactory->createStream(json_encode($newGroup));
-        return $responseFactory->createResponse(201)
+    try {
+        $groupId = createGroup($groupname, $groupabout,$createdAt);
+        // Return the newly created group in the response
+        $newGroup = ['groupid' => $groupId, 'groupname' => $groupname, 'groupabout' => $groupabout];
+        $stream = $streamFactory->createStream(json_encode($newGroup));
+            return $responseFactory->createResponse(201)
+                ->withHeader('Content-Type', 'application/json')
+                ->withBody($stream);
+    }  catch (\Exception $e) {
+        // Handle any exceptions that occur during the database operation
+        $stream = $streamFactory->createStream(json_encode(['error' => 'Error creating new group']));
+        return $responseFactory->createResponse(500)
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($stream);
+            ->withBody($stream); 
+    }
+
+
 }
 
 function joinGroup(Request $request, Response $response)
@@ -219,7 +246,9 @@ function joinGroup(Request $request, Response $response)
     $data = $request->getParsedBody();
 
     // Check if the required fields are provided in the request body
-    if (!isset($data['groupid'])) {
+    $groupId = $data['groupid'];
+    
+    if (empty($groupId)) {
         $stream = $streamFactory->createStream(json_encode(['error' => 'Missing group_id']));
         return $responseFactory->createResponse(400)
             ->withHeader('Content-Type', 'application/json')
@@ -297,7 +326,7 @@ function sendMessage(Request $request, Response $response)
             ->withBody($stream); 
     } catch (\Exception $e) {
         // Handle any exceptions that occur during the database operation
-        $stream = $streamFactory->createStream(json_encode(['error' => 'Error sending message: ' . $e->getMessage()]));
+        $stream = $streamFactory->createStream(json_encode(['error' => 'Error sending message']));
         return $responseFactory->createResponse(500)
             ->withHeader('Content-Type', 'application/json')
             ->withBody($stream); 
@@ -321,7 +350,10 @@ function viewMessages(Request $request, Response $response)
 
     // Check if the required 'group_id' is provided in the query parameters
     if (empty($groupId)) {
-        return $response->withStatus(400)->withJson(['error' => 'Missing group_id']);
+        $stream = $streamFactory->createStream(json_encode(['error' => 'Missing group_id']));
+        return $responseFactory->createResponse(400)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($stream); 
     }
 
     // Check if the user is a member of the specified group
@@ -332,7 +364,9 @@ function viewMessages(Request $request, Response $response)
             ->withBody($stream); 
     }
 
-    // Set a long polling timeout 
+    //long poll is blocking other request
+
+ /*    // Set a long polling timeout 
     $longPollingTimeout = 30;
     // Perform long polling
     $startPollingTime = time();
@@ -370,21 +404,21 @@ function viewMessages(Request $request, Response $response)
         return $responseFactory->createResponse(500)
             ->withHeader('Content-Type', 'application/json')
             ->withBody($stream);
-    }
+    } */
 
-    // try {
-    //     $messages = getMessagesByGroup($groupId);
-    //     $stream = $streamFactory->createStream(json_encode(['messages' => $messages]));
-    //     return $responseFactory->createResponse(200)
-    //         ->withHeader('Content-Type', 'application/json')
-    //         ->withBody($stream); 
-    // } catch (\Exception $e) {
-    //     // Handle any exceptions that occur during the database operation
-    //     $stream = $streamFactory->createStream(json_encode(['error' => 'Error Fetching message: ' . $e->getMessage()]));
-    //     return $responseFactory->createResponse(500)
-    //         ->withHeader('Content-Type', 'application/json')
-    //         ->withBody($stream); 
-    // }
+    try {
+        $messages = getMessagesByGroup($groupId);
+        $stream = $streamFactory->createStream(json_encode(['messages' => $messages]));
+        return $responseFactory->createResponse(200)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($stream); 
+    } catch (\Exception $e) {
+        // Handle any exceptions that occur during the database operation
+        $stream = $streamFactory->createStream(json_encode(['error' => 'Error Fetching message']));
+        return $responseFactory->createResponse(500)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($stream); 
+    }
 
 
 }
@@ -405,37 +439,5 @@ function joinGroupById($userId, $groupId)
     return addGroupMember($groupId, $userId);
 }
 
-
-
-
-
-// function getAllGroups(Request $request, Response $response)
-// {
-//     $responseFactory = new ResponseFactory();
-//     $streamFactory = new StreamFactory();
-
-//     if (isUserAuthenticated()) {
-//         // $groups = getGroupsFromDatabase();
-//         // Retrieve all groups from the database
-//         $groups = getAllGroupsFromDatabase();
-//         $stream = $streamFactory->createStream(json_encode($groups));
-//         // Return the groups as a JSON response
-//         return $responseFactory->createResponse(201)
-//         ->withHeader('Content-Type', 'application/json')
-//         ->withBody($stream);
-//     }else {
-//         // User is not authenticated, return an error response
-//         $stream = $streamFactory->createStream(json_encode(['error' => 'Unauthorized']));
-//         return $responseFactory->createResponse(401)
-//         ->withHeader('Content-Type', 'application/json')
-//         ->withBody($stream);
-    
-//     }
-
-// }
-
-// handlers.php
-
-// ... Other functions ...
 
 

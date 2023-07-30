@@ -1,0 +1,6 @@
+username,password,expected_status,response1,response2,testtype
+,,400,'error','Invalid credentials','Empty username & password test'
+user,,400,'error','Invalid credentials','Empty password test'
+,pass,400,'error','Invalid credentials','Empty username test'
+user2new,password2new,401,'error','Invalid credentials','Invalid credentials test'
+user1,password1,201,'token', '','Successful Sign In test'

@@ -1,0 +1,4 @@
+groupname,groupabout,expected_status,testtype
+Group 1,About Group 1,201,Add new group with authentication test
+,About Group 2,400,Missing groupname test
+Group 3,,400,Missing groupabout test

@@ -1,0 +1,6 @@
+groupid,message_content,expected_status,response1,response2,testtype
+1,"Hello this is a test message.",200,'message','Message sent successfully','Valid message'
+1,"Another test message.",200,'message','Message sent successfully','Valid message'
+20,"Hello this is a message for a non-existing group.",403,'error','You are not a member of the specified group','Non-existing group'
+,"Empty groupid",400,'error','Missing group_id or message','Empty groupid'
+12,"",400,'error','Missing group_id or message','Empty message'

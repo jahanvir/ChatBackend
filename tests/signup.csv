@@ -1,0 +1,7 @@
+username,password,expected_status,response1,response2,testtype
+,,400,'error','Username and password are required','Empty username & password test'
+user,,400,'error','Username and password are required','Empty password test'
+,pass,400,'error','Username and password are required','Empty username test'
+user2new,password2new,201,'message','User created successfully','Sucess test'
+user1,password1,400,'error', 'Username already exists','Username already exists test'
+

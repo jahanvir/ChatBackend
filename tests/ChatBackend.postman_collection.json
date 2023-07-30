@@ -1,0 +1,591 @@
+{
+	"info": {
+		"_postman_id": "e61c7fee-c09b-496e-8c10-e71030ec1e67",
+		"name": "ChatBackend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26525499",
+		"_collection_link": "https://planetary-flare-956719.postman.co/workspace/youtubeAPI~dc58a015-8e16-4db7-8252-62204b1c1335/collection/26525499-e61c7fee-c09b-496e-8c10-e71030ec1e67?action=share&creator=26525499&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "signup",
+			"item": [
+				{
+					"name": "SignUp",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedStatus = parseInt(pm.iterationData.get(\"expected_status\"));",
+									"const res1=pm.iterationData.get(\"response1\");",
+									"const res2=pm.iterationData.get(\"response2\");",
+									"const testname=pm.iterationData.get(\"testtype\");",
+									"pm.test(testname, function () {",
+									"    pm.response.to.have.status(expectedStatus);",
+									"    pm.response.to.have.jsonBody({",
+									"        res1:res2",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "signin",
+			"item": [
+				{
+					"name": "SignIn",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedStatus = parseInt(pm.iterationData.get(\"expected_status\"));",
+									"const res1=pm.iterationData.get(\"response1\");",
+									"const res2=pm.iterationData.get(\"response2\");",
+									"const testname=pm.iterationData.get(\"testtype\");",
+									"pm.test(testname, function () {",
+									"    pm.response.to.have.status(expectedStatus);",
+									"    // pm.response.to.have.jsonBody(res1);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/signin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SignOut",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:8000/signout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"signout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "group",
+			"item": [
+				{
+					"name": "JoinGroup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test for getAllGroups Endpoint with Authentication",
+									"const expectedStatus = parseInt(pm.iterationData.get(\"expected_status\"));",
+									"const testname=pm.iterationData.get(\"testtype\");",
+									"pm.test(\"Test for getAllGroups Endpoint with Authentication\", function () {",
+									"    // Check if 'userid' and 'token' cookies are set",
+									"    const userIdCookie = pm.cookies.get('userid');",
+									"    const tokenCookie = pm.cookies.get('token');",
+									"",
+									"    if (userIdCookie && tokenCookie) {",
+									"        // For authenticated user (cookies are set)",
+									"        // pm.response.to.have.status(201);",
+									"",
+									"        pm.test(testname, function () {",
+									"        pm.response.to.have.status(expectedStatus);",
+									"    // pm.response.to.have.jsonBody(res1);",
+									"});",
+									"",
+									"    } else {",
+									"        // For non-authenticated user (cookies are not set)",
+									"        pm.response.to.have.status(401);",
+									"        pm.expect(pm.response.json()).to.have.property('error');",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"groupid\": \"{{groupid}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/groups/join",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"groups",
+								"join"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NewGroupAdd",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test for getAllGroups Endpoint with Authentication",
+									"pm.test(\"Test for getAllGroups Endpoint with Authentication\", function () {",
+									"    // Check if 'userid' and 'token' cookies are set",
+									"    const userIdCookie = pm.cookies.get('userid');",
+									"    const tokenCookie = pm.cookies.get('token');",
+									"",
+									"    if (userIdCookie && tokenCookie) {",
+									"        // For authenticated user (cookies are set)",
+									"        pm.sendRequest({",
+									"            url: 'http://localhost:8000/signin',",
+									"            method: 'POST',",
+									"            header: 'Content-Type: application/json',",
+									"            body: {",
+									"                mode: 'raw',",
+									"                raw: JSON.stringify({",
+									"                    \"username\": \"user1\",",
+									"                    \"password\": \"password1\"",
+									"                })",
+									"            }",
+									"        });",
+									"        const expectedStatus = parseInt(pm.iterationData.get(\"expected_status\"));",
+									"        const testname = pm.iterationData.get(\"testtype\");",
+									"",
+									"        pm.test(testname, function () {",
+									"            pm.response.to.have.status(expectedStatus);",
+									"            // pm.response.to.have.jsonBody(res1);",
+									"        });",
+									"",
+									"    } else {",
+									"        // For non-authenticated user (cookies are not set)",
+									"        pm.response.to.have.status(401);",
+									"        pm.expect(pm.response.json()).to.have.property('error');",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"groupname\":\"{{groupname}}\",\n    \"groupabout\":\"{{groupabout}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/groups/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"groups",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GroupById",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test for getAllGroups Endpoint with Authentication",
+									"pm.test(\"Test for getAllGroups Endpoint with Authentication\", function () {",
+									"    // Check if 'userid' and 'token' cookies are set",
+									"    const userIdCookie = pm.cookies.get('userid');",
+									"    const tokenCookie = pm.cookies.get('token');",
+									"    const url = pm.request.url.toString();",
+									"    const groupId = url.split('/').pop();",
+									"",
+									"    if (userIdCookie && tokenCookie) {",
+									"        // For authenticated user (cookies are set)",
+									"        // pm.response.to.have.status(201);",
+									"        if(groupId==1){",
+									"            pm.response.to.have.status(200);",
+									"        } ",
+									"        if(groupId==12) {",
+									"            pm.response.to.have.status(404);",
+									"        }",
+									"",
+									"    } else {",
+									"        // For non-authenticated user (cookies are not set)",
+									"        pm.response.to.have.status(401);",
+									"        pm.expect(pm.response.json()).to.have.property('error');",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/groups/12",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"groups",
+								"12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AllGroups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test for getAllGroups Endpoint with Authentication",
+									"pm.test(\"Test for getAllGroups Endpoint with Authentication\", function () {",
+									"    // Check if 'userid' and 'token' cookies are set",
+									"    const userIdCookie = pm.cookies.get('userid');",
+									"    const tokenCookie = pm.cookies.get('token');",
+									"",
+									"    if (userIdCookie && tokenCookie) {",
+									"        // For authenticated user (cookies are set)",
+									"        pm.response.to.have.status(201);",
+									"",
+									"    } else {",
+									"        // For non-authenticated user (cookies are not set)",
+									"        pm.response.to.have.status(401);",
+									"        pm.expect(pm.response.json()).to.have.property('error');",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/groups",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"groups"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Message",
+			"item": [
+				{
+					"name": "MessageSend",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Send sign-in request to http://localhost:8000/signin",
+									"pm.sendRequest({",
+									"    url: 'http://localhost:8000/signin',",
+									"    method: 'POST',",
+									"    header: 'Content-Type: application/json',",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"            \"username\": \"user1\",",
+									"            \"password\": \"password1\"",
+									"        })",
+									"    }",
+									"});",
+									"    // Get the response body as JSON",
+									"",
+									"    // Set the cookies 'userid' and 'token' for subsequent requests",
+									"",
+									"    // Now, perform the tests for the sendMessage endpoint",
+									"// const expectedStatus = parseInt(pm.iterationData.get(\"expected_status\"));",
+									"// const testname = pm.iterationData.get(\"testtype\");",
+									"// const res1 = pm.iterationData.get(\"response1\");",
+									"// const res2 = pm.iterationData.get(\"response2\");",
+									"const expectedStatus = parseInt(pm.iterationData.get(\"expected_status\"));",
+									"const testname = pm.iterationData.get(\"testtype\");",
+									"pm.test(\"Test for sendMessage Endpoint with Authentication\", function () {",
+									"    // Check if 'userid' and 'token' cookies are set",
+									"    const userIdCookie = pm.cookies.get('userid');",
+									"    const tokenCookie = pm.cookies.get('token');",
+									"    const expectedStatus = parseInt(pm.iterationData.get(\"expected_status\"));",
+									"    const testname=pm.iterationData.get(\"testtype\");",
+									"",
+									"    if (userIdCookie && tokenCookie) {",
+									"        // For authenticated user (cookies are set)",
+									"        pm.test(testname, function () {",
+									"            pm.response.to.have.status(expectedStatus);",
+									"            // pm.response.to.have.jsonBody(JSON.parse(res1), JSON.parse(res2));",
+									"        });",
+									"    } else {",
+									"        // For non-authenticated user (cookies are not set)",
+									"        pm.response.to.have.status(401);",
+									"        pm.expect(pm.response.json()).to.have.property('error');",
+									"    }",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"groupid\":\"{{groupid}}\",\n    \"message_content\":\"{{message_content}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/message/send",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"message",
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MessageView",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test for sendMesaage Endpoint with Authentication",
+									"pm.test(\"Test for getAllGroups Endpoint with Authentication\", function () {",
+									"    // Check if 'userid' and 'token' cookies are set",
+									"    const userIdCookie = pm.cookies.get('userid');",
+									"    const tokenCookie = pm.cookies.get('token');",
+									"",
+									"    if (userIdCookie && tokenCookie) {",
+									"        // For authenticated user (cookies are set)",
+									"        const groupId = pm.request.url.query.get('groupid');",
+									"",
+									"        if (groupId) {",
+									"            if(groupId==1){",
+									"                pm.expect(groupId).to.not.be.null;",
+									"                pm.response.to.have.status(200);",
+									"            } else",
+									"            {",
+									"                pm.test(\"User not a member of the specified group test\", function () {",
+									"                    // const validGroupId = \"12\"; // Replace \"12\" with your valid group ID",
+									"",
+									"                    // Check if groupId is valid and not equal to the valid group ID",
+									"                    pm.expect(groupId).to.not.be.null;",
+									"                        // pm.expect(groupId).to.not.eql(validGroupId); // You may add this if you have a specific valid group ID to test against",
+									"                    pm.response.to.have.status(403);",
+									"                    pm.response.to.have.jsonBody({",
+									"                            \"error\": \"You are not a member of the specified group\"",
+									"                    });",
+									"                });",
+									"            }",
+									"        } else {",
+									"            // For authenticated user without groupId (invalid request)",
+									"            pm.response.to.have.status(400);",
+									"            pm.response.to.have.jsonBody({",
+									"                \"error\": \"Missing group_id\"",
+									"            });",
+									"        }",
+									"    } else {",
+									"        // For non-authenticated user (cookies are not set)",
+									"        pm.response.to.have.status(401);",
+									"        pm.expect(pm.response.json()).to.have.property('error');",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"groupid\":\"2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/message/view?groupid=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"message",
+								"view"
+							],
+							"query": [
+								{
+									"key": "groupid",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
